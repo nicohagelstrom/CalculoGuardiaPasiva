@@ -4,36 +4,207 @@
   <meta charset="UTF-8">
   <title>Simulador de Guardias Técnicas</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f6f8fa;}
-    label { display: block; margin: 8px 0 4px; }
-    input[type="number"] { width: 100px; }
-    select { min-width: 180px; margin-bottom: 8px;}
-    .container { display: flex; gap: 30px; flex-wrap: wrap; }
-    .block { min-width: 300px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #ddd; padding: 18px;}
-    .week-section { margin: 14px 0 20px 0; background: #f1f5fa; border-radius: 8px; padding: 15px; box-shadow: 0 2px 6px #e0e0e0;}
-    .week-title { font-weight: bold; margin-bottom: 10px;}
+    :root {
+      --main-color: #e97132;
+      --bg-light: #f9f6f3;
+      --card-bg: #fff;
+      --border-radius: 14px;
+      --shadow: 0 4px 20px #0001;
+      --font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    body {
+      font-family: var(--font-family);
+      margin: 0;
+      background: var(--bg-light);
+      color: #2d2d2d;
+    }
+    h1 {
+      color: var(--main-color);
+      letter-spacing: 2px;
+      margin-top: 30px;
+      text-align: center;
+      font-weight: 900;
+      font-size: 2.2em;
+    }
+    .container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 30px auto 10px auto;
+      max-width: 1300px;
+    }
+    .block {
+      min-width: 300px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 24px 22px 10px 22px;
+      margin-bottom: 16px;
+    }
+    .block h3 {
+      color: var(--main-color);
+      font-size: 1.2em;
+      margin-bottom: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 3px 0;
+      font-weight: 500;
+    }
+    input[type="number"], select {
+      width: 100%;
+      border-radius: 7px;
+      border: 1px solid #e5e5e5;
+      padding: 7px 8px;
+      font-size: 1em;
+      margin-bottom: 8px;
+      background: #faf8f7;
+      transition: border .2s;
+    }
+    input[type="number"]:focus, select:focus {
+      border: 1.5px solid var(--main-color);
+      outline: none;
+    }
+    .week-section {
+      margin: 18px 0 24px 0;
+      background: #fff7f2;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 10px #e9713212;
+      padding: 18px 18px 10px 18px;
+    }
+    .week-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--main-color);
+      font-size: 1.13em;
+      letter-spacing: 0.5px;
+    }
     .results-summary, .earnings-resume, .week-results {
+      margin-top: 25px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 24px 30px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .results-resume {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
       margin-top: 18px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px #e0e0e0;
-      padding: 18px 24px;
     }
-    .summary-title { font-weight: bold; color: #333; margin-bottom: 6px;}
-    .summary-item { color: #555; font-size: 1.1em; margin-right: 24px; margin-bottom: 6px;}
+    .result-card {
+      background: #fff7f2;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 10px #e971321a;
+      padding: 20px 24px;
+      min-width: 210px;
+      max-width: 260px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      border-left: 8px solid var(--main-color);
+      transition: box-shadow .2s;
+    }
+    .result-title {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #555;
+      letter-spacing: 0.5px;
+    }
+    .result-number {
+      font-size: 1.3em;
+      color: var(--main-color);
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .result-label {
+      color: #888;
+      font-size: 0.98em;
+    }
+    .summary-title {
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 6px;
+      font-size: 1.12em;
+    }
+    .summary-item {
+      color: #555;
+      font-size: 1.08em;
+      margin-right: 24px;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
     .week-box {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       padding-bottom: 10px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #e8e8e8;
     }
-    .member-row { margin-bottom: 4px;}
-    .member-name { font-weight: bold;}
-    .engineer-name { color: #2188ff;}
-    .technician-name { color: #d73a49;}
-    .week-cost { margin-top: 6px; font-weight: bold;}
-    .week-label { font-weight: bold; color: #28a745; }
-    @media (max-width: 700px) {
-      .container, .results-summary { flex-direction: column; gap: 10px;}
+    .member-row {
+      margin-bottom: 4px;
+      font-size: 1em;
+      letter-spacing: 0.1px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .member-name {
+      font-weight: bold;
+      padding-right: 6px;
+    }
+    .engineer-name { color: #2188ff; }
+    .technician-name { color: #d73a49; }
+    .supervisor-name { color: var(--main-color); }
+    .week-cost {
+      margin-top: 6px;
+      font-weight: bold;
+      color: var(--main-color);
+      font-size: 1.08em;
+    }
+    .week-label {
+      font-weight: bold;
+      color: #28a745;
+      font-size: 1.09em;
+    }
+    .earnings-row {
+      margin-bottom: 7px;
+      font-size: 1.07em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .app-btn {
+      margin: 32px auto 18px auto;
+      font-size: 1.18em;
+      letter-spacing: 1px;
+      padding: 12px 34px;
+      border-radius: 32px;
+      background: var(--main-color);
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px #e9713233;
+      cursor: pointer;
+      display: block;
+      transition: background .18s, box-shadow .18s;
+    }
+    .app-btn:hover {
+      background: #ff994c;
+      box-shadow: 0 4px 16px #e9713266;
+    }
+    @media (max-width: 900px) {
+      .container { flex-direction: column; gap: 18px; max-width: 100vw; }
+      .results-summary, .earnings-resume, .week-results { padding: 18px 12px; }
+      .block { padding: 18px 14px; }
+      .results-resume { gap: 8px; }
     }
   </style>
 </head>
@@ -45,9 +216,11 @@
       <label>Semanas en el mes</label>
       <input type="number" id="numWeeks" value="4" min="1" max="6" onchange="renderWeekSelectors()">
       <label>Ingenieros por semana</label>
-      <input type="number" id="ingenieros" value="1" min="1" max="4" onchange="renderWeekSelectors()">
+      <input type="number" id="ingenieros" value="1" min="0" max="4" onchange="renderWeekSelectors()">
       <label>Técnicos por semana</label>
-      <input type="number" id="tecnicos" value="1" min="1" max="4" onchange="renderWeekSelectors()">
+      <input type="number" id="tecnicos" value="1" min="0" max="4" onchange="renderWeekSelectors()">
+      <label>Valor hora Supervisor</label>
+      <input type="number" id="valorSup" value="2750">
       <label>Valor hora Ingeniero</label>
       <input type="number" id="valorIng" value="3150">
       <label>Valor hora Técnico</label>
@@ -75,39 +248,54 @@
       <input type="number" id="m4" value="100">
     </div>
   </div>
-  <div id="weeks-selector"></div>
-  <button onclick="calcular()" style="margin-top: 28px; font-size: 1.1em; padding: 10px 22px; border-radius: 6px; background: #2188ff; color: #fff; border: none; cursor: pointer;">Calcular Plan</button>
+  <form id="weekForm">
+    <div id="weeks-selector"></div>
+  </form>
+  <button class="app-btn" onclick="calcular()">Calcular Plan</button>
   <div class="results" id="output"></div>
+
   <script>
     const engineerNames = ["Martinez Walter", "Baginay Lucas", "Mesa Carlos", "Tribulo Matias"];
     const technicianNames = ["Garita Axel", "Villen Facundo", "Franco Alan", "Heimsath Ivan"];
+    const supervisorNames = ["Maximiliano Aguirre", "Esteban Correa", "Belen Santomil"];
+
     function renderWeekSelectors() {
-      const numWeeks = parseInt(document.getElementById("numWeeks").value) || 4;
-      const ing = parseInt(document.getElementById("ingenieros").value) || 1;
-      const tec = parseInt(document.getElementById("tecnicos").value) || 1;
+      const numWeeks = +document.getElementById("numWeeks").value;
+      const ing = +document.getElementById("ingenieros").value;
+      const tec = +document.getElementById("tecnicos").value;
       let html = '';
       for (let w = 0; w < numWeeks; w++) {
         html += `<div class="week-section"><div class="week-title">Semana ${w+1}:</div>`;
         for (let i = 0; i < ing; i++) {
           html += `<label>Ingeniero ${i+1}:</label>
-            <select id="week${w}_engineer${i}">
+            <select id="week${w}_engineer${i}" name="week${w}_engineer${i}">
               ${engineerNames.map(name => `<option>${name}</option>`).join('')}
             </select>`;
         }
         for (let i = 0; i < tec; i++) {
           html += `<label>Técnico ${i+1}:</label>
-            <select id="week${w}_technician${i}">
+            <select id="week${w}_technician${i}" name="week${w}_technician${i}">
               ${technicianNames.map(name => `<option>${name}</option>`).join('')}
             </select>`;
         }
+        // Supervisor selector y input horas
+        html += `<label>Supervisor:</label>
+          <select id="week${w}_supervisor" name="week${w}_supervisor">
+            <option value="">(Sin supervisor)</option>
+            ${supervisorNames.map(name => `<option>${name}</option>`).join('')}
+          </select>
+          <label>Horas supervisor semana ${w+1}:</label>
+          <input type="number" min="0" max="96" step="1" value="12" id="week${w}_supHours" name="week${w}_supHours">
+        `;
         html += `</div>`;
       }
       document.getElementById("weeks-selector").innerHTML = html;
     }
+
     renderWeekSelectors();
-    document.getElementById("numWeeks").addEventListener("change", renderWeekSelectors);
-    document.getElementById("ingenieros").addEventListener("change", renderWeekSelectors);
-    document.getElementById("tecnicos").addEventListener("change", renderWeekSelectors);
+    document.querySelectorAll("#numWeeks, #ingenieros, #tecnicos").forEach(e => {
+      e.addEventListener("change", renderWeekSelectors);
+    });
 
     function calcular() {
       const numWeeks = +document.getElementById("numWeeks").value;
@@ -115,73 +303,63 @@
       const tec = +document.getElementById("tecnicos").value;
       const valIng = +document.getElementById("valorIng").value;
       const valTec = +document.getElementById("valorTec").value;
+      const valSup = +document.getElementById("valorSup").value;
       const hSem = +document.getElementById("horasSem").value;
       const diasSem = +document.getElementById("diasSem").value;
       const hFinde = +document.getElementById("horasFinde").value;
       const turnosFinde = +document.getElementById("turnosFinde").value;
       const viat = +document.getElementById("viaticos").value;
-      const margen1 = +document.getElementById("m1").value / 100;
-      const margen2 = +document.getElementById("m2").value / 100;
-      const margen3 = +document.getElementById("m3").value / 100;
-      const margen4 = +document.getElementById("m4").value / 100;
-      // Earnings per week per engineer/technician
-      const engWeekEarning = valIng * hSem * diasSem + valIng * hFinde * turnosFinde;
-      const techWeekEarning = valTec * hSem * diasSem + valTec * hFinde * turnosFinde;
-      // Track total earnings per person
+      const m1 = +document.getElementById("m1").value / 100;
+      const m2 = +document.getElementById("m2").value / 100;
+      const m3 = +document.getElementById("m3").value / 100;
+      const m4 = +document.getElementById("m4").value / 100;
+
       let earnings = {};
-      engineerNames.forEach(n => earnings[n] = 0);
-      technicianNames.forEach(n => earnings[n] = 0);
+      [...engineerNames, ...technicianNames, ...supervisorNames].forEach(n => earnings[n] = 0);
 
       let weekHtml = '';
       let totalWeekCost = 0;
+
       for (let w = 0; w < numWeeks; w++) {
-        let thisEngineers = [];
-        let thisTechnicians = [];
+        let engs = [], techs = [], sups = [];
         for (let i = 0; i < ing; i++) {
           const name = document.getElementById(`week${w}_engineer${i}`).value;
-          earnings[name] += engWeekEarning;
-          thisEngineers.push(name);
+          const engEarning = valIng * hSem * diasSem + valIng * hFinde * turnosFinde;
+          earnings[name] += engEarning;
+          engs.push(name);
         }
         for (let i = 0; i < tec; i++) {
           const name = document.getElementById(`week${w}_technician${i}`).value;
-          earnings[name] += techWeekEarning;
-          thisTechnicians.push(name);
+          const techEarning = valTec * hSem * diasSem + valTec * hFinde * turnosFinde;
+          earnings[name] += techEarning;
+          techs.push(name);
         }
-        const turnoSemanal = (ing * valIng + tec * valTec) * hSem + viat;
-        const semanalTotal = turnoSemanal * diasSem;
-        const turnoFinde = (ing * valIng + tec * valTec) * hFinde + viat;
-        const findeTotal = turnoFinde * turnosFinde;
-        const semanaGlobal = semanalTotal + findeTotal;
-        totalWeekCost += semanaGlobal;
-        let membersHtml = '';
-        thisEngineers.forEach(name => {
-          membersHtml += `<div class="member-row"><span class="engineer-name member-name">${name}</span> gana <b>$${engWeekEarning.toLocaleString()}</b> esta semana</div>`;
-        });
-        thisTechnicians.forEach(name => {
-          membersHtml += `<div class="member-row"><span class="technician-name member-name">${name}</span> gana <b>$${techWeekEarning.toLocaleString()}</b> esta semana</div>`;
-        });
-        membersHtml += `<div class="week-cost">Costo total equipo semana ${w+1}: <b>$${semanaGlobal.toLocaleString()}</b></div>`;
-        weekHtml += `<div class="week-box"><div class="week-label">Semana ${w+1}:</div>${membersHtml}</div>`;
+        // Supervisor y sus horas
+        const supName = document.getElementById(`week${w}_supervisor`).value;
+        const supHours = +document.getElementById(`week${w}_supHours`).value;
+        let supEarning = 0;
+        if (supName) {
+          supEarning = valSup * supHours;
+          earnings[supName] += supEarning;
+          sups.push({ name: supName, hours: supHours, earning: supEarning });
+        }
+
+        // Cálculo de costos semana (ingenieros, técnicos y supervisor)
+        const turnoSem = (ing * valIng + tec * valTec) * hSem + viat + (supName ? valSup * supHours : 0);
+        const totalSem = turnoSem * diasSem;
+        const turnoFind = (ing * valIng + tec * valTec) * hFinde + viat; // supervisor solo suma las horas semanales personalizadas
+        const totalFind = turnoFind * turnosFinde;
+        const totalSemana = totalSem + totalFind;
+        totalWeekCost += totalSemana;
+
+        let rows = '';
+        engs.forEach(n => rows += `<div class="member-row"><span class="engineer-name member-name">${n}</span> gana <b>$${(valIng * hSem * diasSem + valIng * hFinde * turnosFinde).toLocaleString()}</b> esta semana</div>`);
+        techs.forEach(n => rows += `<div class="member-row"><span class="technician-name member-name">${n}</span> gana <b>$${(valTec * hSem * diasSem + valTec * hFinde * turnosFinde).toLocaleString()}</b> esta semana</div>`);
+        sups.forEach(sup => rows += `<div class="member-row"><span class="supervisor-name member-name">${sup.name}</span> gana <b>$${sup.earning.toLocaleString()}</b> por ${sup.hours} hs esta semana</div>`);
+
+        rows += `<div class="week-cost">Costo total equipo semana ${w+1}: <b>$${totalSemana.toLocaleString()}</b></div>`;
+        weekHtml += `<div class="week-box"><div class="week-label">Semana ${w+1}:</div>${rows}</div>`;
       }
-
-      // Margins
-      const margen = (m) => totalWeekCost + (totalWeekCost * m);
-      const mensualMargen = (m) => margen(m);
-
-      const marginConfigs = [
-        { name: "25%", color: "#2188ff", value: mensualMargen(margen1), emoji: "📊" },
-        { name: "50%", color: "#28a745", value: mensualMargen(margen2), emoji: "📊" },
-        { name: "75%", color: "#ffd33d", value: mensualMargen(margen3), emoji: "📊" },
-        { name: "100%", color: "#d73a49", value: mensualMargen(margen4), emoji: "📊" }
-      ];
-
-      let resultBoxes = marginConfigs.map((m, idx) => `
-        <div class="result-card" style="border-left:6px solid ${m.color};margin-bottom:8px;">
-          <div class="result-title">${m.emoji} Margen ${m.name}</div>
-          <div class="result-number" style="color:${m.color};">$${m.value.toLocaleString()}</div>
-          <div class="result-label">Presupuesto mensual</div>
-        </div>
-      `).join('');
 
       const summary = `
         <div class="results-summary">
@@ -189,17 +367,31 @@
             <div class="summary-title">Costo total del mes (sin margen):</div>
             <div class="summary-item">$${totalWeekCost.toLocaleString()}</div>
           </div>
-        </div>
-      `;
+        </div>`;
 
-      // Individual earning summary
+      const marginConfigs = [
+        { name: "25%", color: "#e97132", value: totalWeekCost * (1 + m1), emoji: "📊" },
+        { name: "50%", color: "#28a745", value: totalWeekCost * (1 + m2), emoji: "📊" },
+        { name: "75%", color: "#ffd33d", value: totalWeekCost * (1 + m3), emoji: "📊" },
+        { name: "100%", color: "#d73a49", value: totalWeekCost * (1 + m4), emoji: "📊" }
+      ];
+
+      const resultBoxes = marginConfigs.map(m => `
+        <div class="result-card" style="border-left:8px solid ${m.color};margin-bottom:8px;">
+          <div class="result-title">${m.emoji} Margen ${m.name}</div>
+          <div class="result-number" style="color:${m.color};">$${m.value.toLocaleString()}</div>
+          <div class="result-label">Presupuesto mensual</div>
+        </div>
+      `).join('');
+
       let earningsRows = '';
-      Object.entries(earnings).forEach(([name, amount]) => {
+      for (const [name, amount] of Object.entries(earnings)) {
         if (amount > 0) {
-          const roleClass = engineerNames.includes(name) ? "engineer-name" : "technician-name";
+          let roleClass = engineerNames.includes(name) ? "engineer-name" :
+                          technicianNames.includes(name) ? "technician-name" : "supervisor-name";
           earningsRows += `<div class="earnings-row"><span class="${roleClass} member-name">${name}</span> gana <span>$${amount.toLocaleString()}</span> en el mes</div>`;
         }
-      });
+      }
 
       const earningsBox = `
         <div class="earnings-resume">
@@ -209,13 +401,14 @@
       `;
 
       const output = `
-        <h2>🧮 Resumen del Simulador</h2>
+        <h2 style="color:#e97132;">🧮 Resumen del Simulador</h2>
         ${summary}
-        <h3 style="margin-top:22px;">💰 Presupuestos según margen</h3>
+        <h3 style="margin-top:22px;color:#e97132;">💰 Presupuestos según margen</h3>
         <div class="results-resume">${resultBoxes}</div>
         <div class="week-results">${weekHtml}</div>
         ${earningsBox}
       `;
+
       document.getElementById("output").innerHTML = output;
     }
   </script>
