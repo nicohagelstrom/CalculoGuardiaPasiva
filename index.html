@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Guardias Técnicas</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f6f8fa;}
+    label { display: block; margin: 8px 0 4px; }
+    input[type="number"] { width: 100px; }
+    select { min-width: 180px; margin-bottom: 8px;}
+    .container { display: flex; gap: 30px; flex-wrap: wrap; }
+    .block { min-width: 300px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #ddd; padding: 18px;}
+    .week-section { margin: 14px 0 20px 0; background: #f1f5fa; border-radius: 8px; padding: 15px; box-shadow: 0 2px 6px #e0e0e0;}
+    .week-title { font-weight: bold; margin-bottom: 10px;}
+    .results-summary, .earnings-resume, .week-results {
+      margin-top: 18px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #e0e0e0;
+      padding: 18px 24px;
+    }
+    .summary-title { font-weight: bold; color: #333; margin-bottom: 6px;}
+    .summary-item { color: #555; font-size: 1.1em; margin-right: 24px; margin-bottom: 6px;}
+    .week-box {
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .member-row { margin-bottom: 4px;}
+    .member-name { font-weight: bold;}
+    .engineer-name { color: #2188ff;}
+    .technician-name { color: #d73a49;}
+    .week-cost { margin-top: 6px; font-weight: bold;}
+    .week-label { font-weight: bold; color: #28a745; }
+    @media (max-width: 700px) {
+      .container, .results-summary { flex-direction: column; gap: 10px;}
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulador de Guardias Técnicas</h1>
+  <div class="container">
+    <div class="block">
+      <h3>📋 Variables de Guardias</h3>
+      <label>Semanas en el mes</label>
+      <input type="number" id="numWeeks" value="4" min="1" max="6" onchange="renderWeekSelectors()">
+      <label>Ingenieros por semana</label>
+      <input type="number" id="ingenieros" value="1" min="1" max="4" onchange="renderWeekSelectors()">
+      <label>Técnicos por semana</label>
+      <input type="number" id="tecnicos" value="1" min="1" max="4" onchange="renderWeekSelectors()">
+      <label>Valor hora Ingeniero</label>
+      <input type="number" id="valorIng" value="3150">
+      <label>Valor hora Técnico</label>
+      <input type="number" id="valorTec" value="2150">
+      <label>Duración turno semanal (horas)</label>
+      <input type="number" id="horasSem" value="12">
+      <label>Turnos semanales</label>
+      <input type="number" id="diasSem" value="5">
+      <label>Duración turno fin de semana (horas)</label>
+      <input type="number" id="horasFinde" value="48">
+      <label>Turnos de fin de semana</label>
+      <input type="number" id="turnosFinde" value="1">
+      <label>Viáticos por jornada</label>
+      <input type="number" id="viaticos" value="0">
+    </div>
+    <div class="block">
+      <h3>📈 Márgenes de Rentabilidad (%)</h3>
+      <label>Margen 1</label>
+      <input type="number" id="m1" value="25">
+      <label>Margen 2</label>
+      <input type="number" id="m2" value="50">
+      <label>Margen 3</label>
+      <input type="number" id="m3" value="75">
+      <label>Margen 4</label>
+      <input type="number" id="m4" value="100">
+    </div>
+  </div>
+  <div id="weeks-selector"></div>
+  <button onclick="calcular()" style="margin-top: 28px; font-size: 1.1em; padding: 10px 22px; border-radius: 6px; background: #2188ff; color: #fff; border: none; cursor: pointer;">Calcular Plan</button>
+  <div class="results" id="output"></div>
+  <script>
+    const engineerNames = ["Martinez Walter", "Baginay Lucas", "Mesa Carlos", "Tribulo Matias"];
+    const technicianNames = ["Garita Axel", "Villen Facundo", "Franco Alan", "Heimsath Ivan"];
+    function renderWeekSelectors() {
+      const numWeeks = parseInt(document.getElementById("numWeeks").value) || 4;
+      const ing = parseInt(document.getElementById("ingenieros").value) || 1;
+      const tec = parseInt(document.getElementById("tecnicos").value) || 1;
+      let html = '';
+      for (let w = 0; w < numWeeks; w++) {
+        html += `<div class="week-section"><div class="week-title">Semana ${w+1}:</div>`;
+        for (let i = 0; i < ing; i++) {
+          html += `<label>Ingeniero ${i+1}:</label>
+            <select id="week${w}_engineer${i}">
+              ${engineerNames.map(name => `<option>${name}</option>`).join('')}
+            </select>`;
+        }
+        for (let i = 0; i < tec; i++) {
+          html += `<label>Técnico ${i+1}:</label>
+            <select id="week${w}_technician${i}">
+              ${technicianNames.map(name => `<option>${name}</option>`).join('')}
+            </select>`;
+        }
+        html += `</div>`;
+      }
+      document.getElementById("weeks-selector").innerHTML = html;
+    }
+    renderWeekSelectors();
+    document.getElementById("numWeeks").addEventListener("change", renderWeekSelectors);
+    document.getElementById("ingenieros").addEventListener("change", renderWeekSelectors);
+    document.getElementById("tecnicos").addEventListener("change", renderWeekSelectors);
+
+    function calcular() {
+      const numWeeks = +document.getElementById("numWeeks").value;
+      const ing = +document.getElementById("ingenieros").value;
+      const tec = +document.getElementById("tecnicos").value;
+      const valIng = +document.getElementById("valorIng").value;
+      const valTec = +document.getElementById("valorTec").value;
+      const hSem = +document.getElementById("horasSem").value;
+      const diasSem = +document.getElementById("diasSem").value;
+      const hFinde = +document.getElementById("horasFinde").value;
+      const turnosFinde = +document.getElementById("turnosFinde").value;
+      const viat = +document.getElementById("viaticos").value;
+      const margen1 = +document.getElementById("m1").value / 100;
+      const margen2 = +document.getElementById("m2").value / 100;
+      const margen3 = +document.getElementById("m3").value / 100;
+      const margen4 = +document.getElementById("m4").value / 100;
+      // Earnings per week per engineer/technician
+      const engWeekEarning = valIng * hSem * diasSem + valIng * hFinde * turnosFinde;
+      const techWeekEarning = valTec * hSem * diasSem + valTec * hFinde * turnosFinde;
+      // Track total earnings per person
+      let earnings = {};
+      engineerNames.forEach(n => earnings[n] = 0);
+      technicianNames.forEach(n => earnings[n] = 0);
+
+      let weekHtml = '';
+      let totalWeekCost = 0;
+      for (let w = 0; w < numWeeks; w++) {
+        let thisEngineers = [];
+        let thisTechnicians = [];
+        for (let i = 0; i < ing; i++) {
+          const name = document.getElementById(`week${w}_engineer${i}`).value;
+          earnings[name] += engWeekEarning;
+          thisEngineers.push(name);
+        }
+        for (let i = 0; i < tec; i++) {
+          const name = document.getElementById(`week${w}_technician${i}`).value;
+          earnings[name] += techWeekEarning;
+          thisTechnicians.push(name);
+        }
+        const turnoSemanal = (ing * valIng + tec * valTec) * hSem + viat;
+        const semanalTotal = turnoSemanal * diasSem;
+        const turnoFinde = (ing * valIng + tec * valTec) * hFinde + viat;
+        const findeTotal = turnoFinde * turnosFinde;
+        const semanaGlobal = semanalTotal + findeTotal;
+        totalWeekCost += semanaGlobal;
+        let membersHtml = '';
+        thisEngineers.forEach(name => {
+          membersHtml += `<div class="member-row"><span class="engineer-name member-name">${name}</span> gana <b>$${engWeekEarning.toLocaleString()}</b> esta semana</div>`;
+        });
+        thisTechnicians.forEach(name => {
+          membersHtml += `<div class="member-row"><span class="technician-name member-name">${name}</span> gana <b>$${techWeekEarning.toLocaleString()}</b> esta semana</div>`;
+        });
+        membersHtml += `<div class="week-cost">Costo total equipo semana ${w+1}: <b>$${semanaGlobal.toLocaleString()}</b></div>`;
+        weekHtml += `<div class="week-box"><div class="week-label">Semana ${w+1}:</div>${membersHtml}</div>`;
+      }
+
+      // Margins
+      const margen = (m) => totalWeekCost + (totalWeekCost * m);
+      const mensualMargen = (m) => margen(m);
+
+      const marginConfigs = [
+        { name: "25%", color: "#2188ff", value: mensualMargen(margen1), emoji: "📊" },
+        { name: "50%", color: "#28a745", value: mensualMargen(margen2), emoji: "📊" },
+        { name: "75%", color: "#ffd33d", value: mensualMargen(margen3), emoji: "📊" },
+        { name: "100%", color: "#d73a49", value: mensualMargen(margen4), emoji: "📊" }
+      ];
+
+      let resultBoxes = marginConfigs.map((m, idx) => `
+        <div class="result-card" style="border-left:6px solid ${m.color};margin-bottom:8px;">
+          <div class="result-title">${m.emoji} Margen ${m.name}</div>
+          <div class="result-number" style="color:${m.color};">$${m.value.toLocaleString()}</div>
+          <div class="result-label">Presupuesto mensual</div>
+        </div>
+      `).join('');
+
+      const summary = `
+        <div class="results-summary">
+          <div>
+            <div class="summary-title">Costo total del mes (sin margen):</div>
+            <div class="summary-item">$${totalWeekCost.toLocaleString()}</div>
+          </div>
+        </div>
+      `;
+
+      // Individual earning summary
+      let earningsRows = '';
+      Object.entries(earnings).forEach(([name, amount]) => {
+        if (amount > 0) {
+          const roleClass = engineerNames.includes(name) ? "engineer-name" : "technician-name";
+          earningsRows += `<div class="earnings-row"><span class="${roleClass} member-name">${name}</span> gana <span>$${amount.toLocaleString()}</span> en el mes</div>`;
+        }
+      });
+
+      const earningsBox = `
+        <div class="earnings-resume">
+          <div style="font-weight:bold; margin-bottom:10px;">💵 Resumen de ganancias individuales</div>
+          ${earningsRows}
+        </div>
+      `;
+
+      const output = `
+        <h2>🧮 Resumen del Simulador</h2>
+        ${summary}
+        <h3 style="margin-top:22px;">💰 Presupuestos según margen</h3>
+        <div class="results-resume">${resultBoxes}</div>
+        <div class="week-results">${weekHtml}</div>
+        ${earningsBox}
+      `;
+      document.getElementById("output").innerHTML = output;
+    }
+  </script>
+</body>
+</html>
